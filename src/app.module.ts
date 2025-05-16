@@ -2,14 +2,20 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot('mongodb+srv://namdh03dev:vejAFwSnAZKdYHMx@nest-js-singapore.z32xw5k.mongodb.net/'),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URL'),
+      }),
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
