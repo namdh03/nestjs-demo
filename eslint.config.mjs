@@ -3,6 +3,7 @@ import eslint from '@eslint/js';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
 
 export default tseslint.config(
   {
@@ -11,6 +12,11 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   eslintPluginPrettierRecommended,
+  {
+    plugins: {
+      'simple-import-sort': eslintPluginSimpleImportSort,
+    },
+  },
   {
     languageOptions: {
       globals: {
@@ -50,6 +56,30 @@ export default tseslint.config(
           endOfLine: 'auto',
         },
       ],
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [
+            // `nestjs` first
+            ['^@nestjs(/.*)?$'],
+            // `mongoose` second
+            ['^mongoose(/.*)?$'],
+            // Packages starting with a character
+            ['^[a-z]'],
+            // Packages starting with `@`
+            ['^@'],
+            // Packages starting with `~`
+            ['^~'],
+            // Imports starting with `../`
+            ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+            // Imports starting with `./`
+            ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+            // Side effect imports
+            ['^\\u0000'],
+          ],
+        },
+      ],
+      'simple-import-sort/exports': 'error',
     },
   },
 );
