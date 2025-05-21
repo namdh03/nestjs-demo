@@ -52,8 +52,17 @@ export class UsersService {
     return await this.userModel.findOne({ email: username });
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    return await this.userModel.updateOne({ _id: id }, updateUserDto);
+  async update(id: string, updateUserDto: UpdateUserDto, user: IUser) {
+    return await this.userModel.updateOne(
+      { _id: id },
+      {
+        ...updateUserDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+      },
+    );
   }
 
   remove(_id: string) {
