@@ -23,8 +23,8 @@ export class CompaniesService {
     });
   }
 
-  async findAll(currentPage: number, limit: number, qs: string) {
-    const { filter, sort, population } = aqp(qs);
+  async findAll(currentPage: number, limit: number, query: Record<string, string>) {
+    const { filter, sort, population } = aqp(query);
     delete filter.page;
     delete filter.limit;
 
@@ -38,6 +38,7 @@ export class CompaniesService {
       .find(filter)
       .skip(offset)
       .limit(defaultLimit)
+      .select('-password')
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       .sort(sort as any)
       .populate(population)

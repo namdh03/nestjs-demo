@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 
@@ -22,8 +22,9 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @ResponseMessage('Fetch user with paginate')
+  findAll(@Query('page') currentPage: string, @Query('limit') limit: string, @Query() query: Record<string, string>) {
+    return this.usersService.findAll(+currentPage, +limit, query);
   }
 
   @Public()
