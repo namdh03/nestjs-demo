@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 
-import { User } from 'src/decorator/customize';
+import { ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from 'src/users/users.interface';
 
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -17,6 +17,7 @@ export class CompaniesController {
   }
 
   @Get()
+  @ResponseMessage('Fetched all companies successfully!')
   findAll(@Query('page') currentPage: string, @Query('limit') limit: string, @Query() qs: string) {
     return this.companiesService.findAll(+currentPage, +limit, qs);
   }
