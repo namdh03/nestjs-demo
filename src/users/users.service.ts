@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import mongoose from 'mongoose';
@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './entities/user.entity';
 
@@ -16,8 +16,7 @@ export class UsersService {
 
   getHashPassword(password: string) {
     const salt = genSaltSync(10);
-    const hash = hashSync(password, salt);
-    return hash;
+    return hashSync(password, salt);
   }
 
   isValidPassword(password: string, hash: string) {
@@ -25,14 +24,15 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
+    const isExited = await this.userModel.findOne({ email: createUserDto.email });
+    if (isExited) throw new BadRequestException(`Email ${createUserDto.email} existed!`);
+
     const hashPassword = this.getHashPassword(createUserDto.password);
-    // Store hash in your password DB
-    const user = await this.userModel.create({
-      email: createUserDto.email,
+
+    return await this.userModel.create({
+      ...createUserDto,
       password: hashPassword,
-      name: createUserDto.name,
     });
-    return user;
   }
 
   findAll() {
@@ -40,7 +40,7 @@ export class UsersService {
   }
 
   async findOne(_id: string) {
-    if (!mongoose.Types.ObjectId.isValid(_id)) return 'not found user';
+    if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('User not found!');
     return await this.userModel.findOne({ _id });
   }
 
@@ -53,7 +53,19 @@ export class UsersService {
   }
 
   remove(_id: string) {
-    if (!mongoose.Types.ObjectId.isValid(_id)) return 'not found user';
+    if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('User not found!');
     return this.userModel.softDelete({ _id });
+  }
+
+  async register(registerUserDto: RegisterUserDto) {
+    const isExited = await this.userModel.findOne({ email: registerUserDto.email });
+    if (isExited) throw new BadRequestException(`Email ${registerUserDto.email} existed!`);
+
+    const hashPassword = this.getHashPassword(registerUserDto.password);
+    return await this.userModel.create({
+      ...registerUserDto,
+      role: 'USER',
+      password: hashPassword,
+    });
   }
 }
