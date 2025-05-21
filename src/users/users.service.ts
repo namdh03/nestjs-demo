@@ -29,7 +29,7 @@ export class UsersService {
     if (isExited) throw new BadRequestException(`Email ${createUserDto.email} existed!`);
 
     const hashPassword = this.getHashPassword(createUserDto.password);
-    const newUser = await this.userModel.create({
+    return await this.userModel.create({
       ...createUserDto,
       password: hashPassword,
       createdBy: {
@@ -37,11 +37,6 @@ export class UsersService {
         email: user.email,
       },
     });
-
-    return {
-      _id: newUser._id,
-      createdAt: newUser.createdAt,
-    };
   }
 
   findAll() {

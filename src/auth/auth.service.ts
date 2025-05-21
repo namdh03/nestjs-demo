@@ -44,11 +44,6 @@ export class AuthService {
   }
 
   async register(registerUserDto: RegisterUserDto) {
-    const user = await this.usersService.register(registerUserDto);
-
-    return {
-      _id: user._id,
-      createdAt: user.createdAt,
-    };
+    return await this.usersService.register(registerUserDto);
   }
 }

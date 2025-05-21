@@ -21,7 +21,11 @@ export class AuthController {
   @Public()
   @ResponseMessage('Register a new user')
   @Post('register')
-  register(@Body() registerUserDto: RegisterUserDto) {
-    return this.authService.register(registerUserDto);
+  async register(@Body() registerUserDto: RegisterUserDto) {
+    const user = await this.authService.register(registerUserDto);
+    return {
+      _id: user._id,
+      createdAt: user.createdAt,
+    };
   }
 }
