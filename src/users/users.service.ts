@@ -45,7 +45,9 @@ export class UsersService {
 
   async findOne(_id: string) {
     if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('User not found!');
-    return await this.userModel.findOne({ _id });
+    const user = await this.userModel.findOne({ _id }, { password: 0 });
+    if (!user) throw new BadRequestException('User not found!');
+    return user;
   }
 
   async findOneByUsername(username: string) {

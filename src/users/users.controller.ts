@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 
-import { ResponseMessage, User } from 'src/decorator/customize';
+import { Public, ResponseMessage, User } from 'src/decorator/customize';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -26,7 +26,9 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Public()
   @Get(':id')
+  @ResponseMessage('Fetch user by id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
