@@ -9,6 +9,7 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './entities/user.entity';
+import { IUser } from './users.interface';
 
 @Injectable()
 export class UsersService {
@@ -23,16 +24,24 @@ export class UsersService {
     return compareSync(password, hash);
   }
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto, user: IUser) {
     const isExited = await this.userModel.findOne({ email: createUserDto.email });
     if (isExited) throw new BadRequestException(`Email ${createUserDto.email} existed!`);
 
     const hashPassword = this.getHashPassword(createUserDto.password);
-
-    return await this.userModel.create({
+    const newUser = await this.userModel.create({
       ...createUserDto,
       password: hashPassword,
+      createdBy: {
+        _id: user._id,
+        email: user.email,
+      },
     });
+
+    return {
+      _id: newUser._id,
+      createdAt: newUser.createdAt,
+    };
   }
 
   findAll() {
