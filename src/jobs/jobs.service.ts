@@ -26,8 +26,8 @@ export class JobsService {
     return `This action returns all jobs`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} job`;
+  findOne(_id: string) {
+    return this.jobModel.findOne({ _id });
   }
 
   update(_id: string, updateJobDto: UpdateJobDto, user: IUser) {
