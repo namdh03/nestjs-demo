@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+
+import mongoose from 'mongoose';
 
 import aqp from 'api-query-params';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
@@ -56,10 +58,12 @@ export class JobsService {
   }
 
   findOne(_id: string) {
-    return this.jobModel.findOne({ _id });
+    if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('Job not found!');
+    return this.jobModel.findById({ _id });
   }
 
   update(_id: string, updateJobDto: UpdateJobDto, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('Job not found!');
     return this.jobModel.updateOne(
       {
         _id,
@@ -75,6 +79,7 @@ export class JobsService {
   }
 
   async remove(_id: string, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('Job not found!');
     await this.jobModel.updateOne(
       { _id },
       {
