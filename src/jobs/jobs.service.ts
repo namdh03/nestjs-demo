@@ -30,8 +30,19 @@ export class JobsService {
     return `This action returns a #${id} job`;
   }
 
-  update(id: number, updateJobDto: UpdateJobDto) {
-    return `This action updates a #${id} job`;
+  update(_id: string, updateJobDto: UpdateJobDto, user: IUser) {
+    return this.jobModel.updateOne(
+      {
+        _id,
+      },
+      {
+        ...updateJobDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+      },
+    );
   }
 
   remove(id: number) {

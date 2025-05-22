@@ -13,8 +13,12 @@ export class JobsController {
 
   @Post()
   @ResponseMessage('Created new job!')
-  create(@Body() createJobDto: CreateJobDto, @User() user: IUser) {
-    return this.jobsService.create(createJobDto, user);
+  async create(@Body() createJobDto: CreateJobDto, @User() user: IUser) {
+    const job = await this.jobsService.create(createJobDto, user);
+    return {
+      _id: job._id,
+      createdAt: job.createdAt,
+    };
   }
 
   @Get()
@@ -28,8 +32,8 @@ export class JobsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateJobDto: UpdateJobDto) {
-    return this.jobsService.update(+id, updateJobDto);
+  update(@Param('id') id: string, @Body() updateJobDto: UpdateJobDto, @User() user: IUser) {
+    return this.jobsService.update(id, updateJobDto, user);
   }
 
   @Delete(':id')
