@@ -1,7 +1,7 @@
-import { Body, Controller, Post, Request, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request, Res, UseGuards } from '@nestjs/common';
 
 import { Response } from 'express';
-import { Public, ResponseMessage } from 'src/decorator/customize';
+import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { IUser } from 'src/users/users.interface';
 
@@ -28,5 +28,11 @@ export class AuthController {
       _id: user._id,
       createdAt: user.createdAt,
     };
+  }
+
+  @ResponseMessage('Register a new user')
+  @Get('account')
+  getAccount(@User() user: IUser) {
+    return user;
   }
 }
