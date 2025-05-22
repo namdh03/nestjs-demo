@@ -45,7 +45,16 @@ export class JobsService {
     );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} job`;
+  async remove(_id: string, user: IUser) {
+    await this.jobModel.updateOne(
+      { _id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+      },
+    );
+    return this.jobModel.softDelete({ _id });
   }
 }
