@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
+import cookieParser from 'cookie-parser';
 import { join } from 'path';
 
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
@@ -35,6 +36,8 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: ['1'],
   });
+
+  app.use(cookieParser());
 
   await app.listen(port ?? 3000);
 }

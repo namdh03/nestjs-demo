@@ -122,4 +122,13 @@ export class UsersService {
       password: hashPassword,
     });
   }
+
+  async updateUserToken(_id: string, refreshToken: string) {
+    return await this.userModel.updateOne(
+      {
+        _id,
+      },
+      { refreshToken },
+    );
+  }
 }
