@@ -21,6 +21,12 @@ export class ResumesController {
     };
   }
 
+  @Post('by-user')
+  @ResponseMessage('Get Resumes by User')
+  getResumesByUser(@User() user: IUser) {
+    return this.resumesService.findByUser(user);
+  }
+
   @Get()
   @ResponseMessage('Fetch all resumes with paginate')
   findAll(
