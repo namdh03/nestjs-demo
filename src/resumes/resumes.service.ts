@@ -75,8 +75,8 @@ export class ResumesService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} resume`;
+  findOne(id: string) {
+    return this.resumeModel.findById(id);
   }
 
   update(id: number, updateResumeDto: UpdateResumeDto) {
