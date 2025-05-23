@@ -50,6 +50,9 @@ export class CreateJobDto {
 
   description: string;
 
+  @IsNotEmpty()
+  location: string;
+
   @IsDateString()
   startDate: Date;
 
