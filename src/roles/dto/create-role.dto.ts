@@ -16,5 +16,5 @@ export class CreateRoleDto {
   @IsNotEmpty()
   @IsMongoId({ each: true })
   @IsArray()
-  permission: mongoose.Schema.Types.ObjectId[];
+  permissions: mongoose.Schema.Types.ObjectId[];
 }
