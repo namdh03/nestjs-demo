@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+
+import mongoose from 'mongoose';
 
 import aqp from 'api-query-params';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
@@ -76,11 +78,32 @@ export class ResumesService {
   }
 
   findOne(id: string) {
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new BadRequestException('Resume not found!');
     return this.resumeModel.findById(id);
   }
 
-  update(id: number, updateResumeDto: UpdateResumeDto) {
-    return `This action updates a #${id} resume`;
+  async update(_id: string, updateResumeDto: UpdateResumeDto, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('Resume not found!');
+    return await this.resumeModel.updateOne(
+      { _id },
+      {
+        status: updateResumeDto.status,
+        updatedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+        $push: {
+          history: {
+            status: updateResumeDto.status,
+            updatedAt: new Date(),
+            updatedBy: {
+              _id: user._id,
+              email: user.email,
+            },
+          },
+        },
+      },
+    );
   }
 
   remove(id: number) {
