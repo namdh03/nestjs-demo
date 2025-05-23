@@ -33,7 +33,8 @@ export class CreateUserDto {
   address: string;
 
   @IsNotEmpty()
-  role: string;
+  @IsMongoId()
+  role: mongoose.Schema.Types.ObjectId;
 
   @IsDefined()
   @IsNotEmptyObject()

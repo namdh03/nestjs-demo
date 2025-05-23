@@ -75,13 +75,29 @@ export class UsersService {
 
   async findOne(_id: string) {
     if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('User not found!');
-    const user = await this.userModel.findOne({ _id }).select('-password');
+    const user = await this.userModel
+      .findOne({ _id })
+      .select('-password')
+      .populate({
+        path: 'role',
+        select: {
+          _id: 1,
+          name: 1,
+        },
+      });
     if (!user) throw new BadRequestException('User not found!');
     return user;
   }
 
   async findOneByUsername(username: string) {
-    return await this.userModel.findOne({ email: username });
+    return await this.userModel.findOne({ email: username }).populate({
+      path: 'role',
+      select: {
+        _id: 1,
+        name: 1,
+        permissions: 1,
+      },
+    });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto, user: IUser) {

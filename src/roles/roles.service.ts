@@ -66,14 +66,20 @@ export class RolesService {
 
   findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) throw new BadRequestException('Role not found!');
-    return this.roleModel.findById(id);
+    return this.roleModel.findById(id).populate({
+      path: 'permissions',
+      select: {
+        _id: 1,
+        apiPath: 1,
+        name: 1,
+        method: 1,
+        module: 1,
+      },
+    });
   }
 
   async update(_id: string, updateRoleDto: UpdateRoleDto, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('Role not found!');
-
-    const role = await this.checkExistedRoleName(updateRoleDto.name);
-    if (role) throw new BadRequestException(`Existed role with name: ${role.name}`);
 
     return this.roleModel.updateOne(
       { _id },
