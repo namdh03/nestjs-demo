@@ -16,6 +16,7 @@ import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { DatabasesModule } from './databases/databases.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AppService } from './app.service';
     ResumesModule,
     PermissionsModule,
     RolesModule,
+    DatabasesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
