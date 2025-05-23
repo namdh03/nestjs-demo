@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 
-import { User } from 'src/decorator/customize';
+import { ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from 'src/users/users.interface';
 
 import { CreatePermissionDto } from './dto/create-permission.dto';
@@ -12,6 +12,7 @@ export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   @Post()
+  @ResponseMessage('Create a new permission')
   async create(@Body() createPermissionDto: CreatePermissionDto, @User() user: IUser) {
     const permission = await this.permissionsService.create(createPermissionDto, user);
     return {
@@ -31,8 +32,9 @@ export class PermissionsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto) {
-    return this.permissionsService.update(+id, updatePermissionDto);
+  @ResponseMessage('Update a permission')
+  update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto, @User() user: IUser) {
+    return this.permissionsService.update(id, updatePermissionDto, user);
   }
 
   @Delete(':id')
