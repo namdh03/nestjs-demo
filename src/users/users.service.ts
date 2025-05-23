@@ -6,6 +6,8 @@ import mongoose from 'mongoose';
 import aqp from 'api-query-params';
 import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
+import { USER_ROLE } from 'src/databases/sample';
+import { Role, RoleDocument } from 'src/roles/entities/role.entity';
 
 import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -14,7 +16,13 @@ import { IUser } from './users.interface';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name)
+    private userModel: SoftDeleteModel<UserDocument>,
+
+    @InjectModel(Role.name)
+    private roleModel: SoftDeleteModel<RoleDocument>,
+  ) {}
 
   getHashPassword(password: string) {
     const salt = genSaltSync(10);
@@ -95,7 +103,6 @@ export class UsersService {
       select: {
         _id: 1,
         name: 1,
-        permissions: 1,
       },
     });
   }
@@ -131,10 +138,12 @@ export class UsersService {
     const isExited = await this.userModel.findOne({ email: registerUserDto.email });
     if (isExited) throw new BadRequestException(`Email ${registerUserDto.email} existed!`);
 
+    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
+
     const hashPassword = this.getHashPassword(registerUserDto.password);
     return await this.userModel.create({
       ...registerUserDto,
-      role: 'USER',
+      role: userRole?._id,
       password: hashPassword,
     });
   }
@@ -149,6 +158,9 @@ export class UsersService {
   }
 
   async findUserByRefreshToken(refreshToken: string) {
-    return await this.userModel.findOne({ refreshToken });
+    return await this.userModel.findOne({ refreshToken }).populate({
+      path: 'role',
+      select: { name: 1 },
+    });
   }
 }

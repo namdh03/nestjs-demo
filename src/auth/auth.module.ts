@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
 import ms, { StringValue } from 'ms';
+import { RolesModule } from 'src/roles/roles.module';
 
 import { UsersModule } from '../users/users.module';
 
@@ -15,6 +16,7 @@ import { AuthService } from './auth.service';
 @Module({
   imports: [
     UsersModule,
+    RolesModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

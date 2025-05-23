@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common
 
 import { Request, Response } from 'express';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
+import { RolesService } from 'src/roles/roles.service';
 import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { IUser } from 'src/users/users.interface';
 
@@ -10,7 +11,10 @@ import { LocalAuthGuard } from './local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private rolesService: RolesService,
+  ) {}
 
   @Public()
   @UseGuards(LocalAuthGuard)
@@ -33,8 +37,12 @@ export class AuthController {
 
   @ResponseMessage('Register a new user')
   @Get('account')
-  getAccount(@User() user: IUser) {
-    return user;
+  async getAccount(@User() user: IUser) {
+    const temp = await this.rolesService.findOne(user.role._id);
+    return {
+      ...user,
+      permissions: temp?.permissions || [],
+    };
   }
 
   @Public()

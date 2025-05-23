@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { Response } from 'express';
 import ms, { StringValue } from 'ms';
+import { RolesService } from 'src/roles/roles.service';
 import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { IUser } from 'src/users/users.interface';
 import { UsersService } from 'src/users/users.service';
@@ -14,6 +15,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private rolesService: RolesService,
   ) {}
 
   async validateUser(username: string, pass: string) {
@@ -21,14 +23,21 @@ export class AuthService {
 
     if (user) {
       const isValid = this.usersService.isValidPassword(pass, user.password);
-      if (isValid) return user;
+      if (isValid) {
+        const userRole = user.role as unknown as { _id: string; name: string };
+        const temp = await this.rolesService.findOne(userRole._id);
+        return {
+          ...user.toObject(),
+          permissions: temp?.permissions || [],
+        };
+      }
     }
 
     return null;
   }
 
   async login(user: IUser, response: Response) {
-    const { _id, name, email, role } = user;
+    const { _id, name, email, role, permissions } = user;
     const payload = {
       sub: 'token login',
       iss: 'from server',
@@ -52,6 +61,7 @@ export class AuthService {
       name,
       email,
       role,
+      permissions,
     };
   }
 
@@ -87,6 +97,9 @@ export class AuthService {
 
         await this.usersService.updateUserToken(_id.toString(), refresh_token);
 
+        const userRole = user.role as unknown as { _id: string; name: string };
+        const temp = await this.rolesService.findOne(userRole._id);
+
         response.clearCookie('refresh_token');
         response.cookie('refresh_token', refresh_token, {
           httpOnly: true,
@@ -99,6 +112,7 @@ export class AuthService {
           name,
           email,
           role,
+          permissions: temp?.permissions || [],
         };
       } else {
         throw new BadRequestException('User not found!');
