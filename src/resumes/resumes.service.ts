@@ -1,12 +1,45 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 
-import { CreateResumeDto } from './dto/create-resume.dto';
+import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
+import { IUser } from 'src/users/users.interface';
+
+import { CreateUserCVDto } from './dto/create-resume.dto';
 import { UpdateResumeDto } from './dto/update-resume.dto';
+import { Resume, ResumeDocument } from './entities/resume.entity';
 
 @Injectable()
 export class ResumesService {
-  create(createResumeDto: CreateResumeDto) {
-    return 'This action adds a new resume';
+  constructor(@InjectModel(Resume.name) private resumeModel: SoftDeleteModel<ResumeDocument>) {}
+
+  async create(createResumeDto: CreateUserCVDto, user: IUser) {
+    const resume = await this.resumeModel.create({
+      ...createResumeDto,
+      email: user.email,
+      userId: user._id,
+      status: 'PENDING',
+      createdBy: {
+        _id: user._id,
+        email: user.email,
+      },
+    });
+    await this.resumeModel.updateOne(
+      { _id: resume._id },
+      {
+        history: [
+          {
+            status: 'PENDING',
+            updatedAt: resume.updatedAt,
+            updatedBy: {
+              _id: user._id,
+              email: user.email,
+            },
+          },
+        ],
+      },
+    );
+
+    return resume;
   }
 
   findAll() {

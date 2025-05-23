@@ -1,6 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 
-import { CreateResumeDto } from './dto/create-resume.dto';
+import { User } from 'src/decorator/customize';
+import { IUser } from 'src/users/users.interface';
+
+import { CreateUserCVDto } from './dto/create-resume.dto';
 import { UpdateResumeDto } from './dto/update-resume.dto';
 import { ResumesService } from './resumes.service';
 
@@ -9,8 +12,12 @@ export class ResumesController {
   constructor(private readonly resumesService: ResumesService) {}
 
   @Post()
-  create(@Body() createResumeDto: CreateResumeDto) {
-    return this.resumesService.create(createResumeDto);
+  async create(@Body() createResumeDto: CreateUserCVDto, @User() user: IUser) {
+    const resume = await this.resumesService.create(createResumeDto, user);
+    return {
+      _id: resume._id,
+      createdAt: resume.createdAt,
+    };
   }
 
   @Get()
