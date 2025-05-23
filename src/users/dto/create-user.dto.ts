@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
 
 import { Type } from 'class-transformer';
-import { IsDefined, IsEmail, IsNotEmpty, IsNotEmptyObject, IsObject, ValidateNested } from 'class-validator';
+import { IsDefined, IsEmail, IsMongoId, IsNotEmpty, IsNotEmptyObject, IsObject, ValidateNested } from 'class-validator';
 
 class CompanyDto {
   @IsNotEmpty()
+  @IsMongoId()
   _id: mongoose.Schema.Types.ObjectId;
 
   @IsNotEmpty()

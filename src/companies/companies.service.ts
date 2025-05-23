@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+
+import mongoose from 'mongoose';
 
 import aqp from 'api-query-params';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
@@ -55,8 +57,9 @@ export class CompaniesService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} company`;
+  findOne(_id: string) {
+    if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('Company not found!');
+    return this.companyModel.findById(_id);
   }
 
   update(_id: string, updateCompanyDto: UpdateCompanyDto, user: IUser) {

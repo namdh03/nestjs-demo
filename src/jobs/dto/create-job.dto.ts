@@ -6,6 +6,7 @@ import {
   IsDateString,
   IsDefined,
   IsInt,
+  IsMongoId,
   IsNotEmpty,
   IsNotEmptyObject,
   IsObject,
@@ -15,6 +16,7 @@ import {
 
 class CompanyDto {
   @IsNotEmpty()
+  @IsMongoId()
   _id: mongoose.Schema.Types.ObjectId;
 
   @IsNotEmpty()
