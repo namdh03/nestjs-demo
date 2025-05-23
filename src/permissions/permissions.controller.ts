@@ -1,5 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 
+import { User } from 'src/decorator/customize';
+import { IUser } from 'src/users/users.interface';
+
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { PermissionsService } from './permissions.service';
@@ -9,8 +12,12 @@ export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   @Post()
-  create(@Body() createPermissionDto: CreatePermissionDto) {
-    return this.permissionsService.create(createPermissionDto);
+  async create(@Body() createPermissionDto: CreatePermissionDto, @User() user: IUser) {
+    const permission = await this.permissionsService.create(createPermissionDto, user);
+    return {
+      _id: permission._id,
+      createdAt: permission.createdAt,
+    };
   }
 
   @Get()
