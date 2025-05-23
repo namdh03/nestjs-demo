@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import mongoose from 'mongoose';
 
+import aqp from 'api-query-params';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
 
@@ -30,8 +31,37 @@ export class RolesService {
     });
   }
 
-  findAll() {
-    return `This action returns all roles`;
+  async findAll(currentPage: number, limit: number, query: Record<string, string>) {
+    const { filter, sort, population, projection } = aqp(query);
+    delete filter.current;
+    delete filter.pageSize;
+
+    const offset = (+currentPage - 1) * +limit;
+    const defaultLimit = +limit ? +limit : 10;
+
+    const totalItems = (await this.roleModel.find(filter)).length;
+    const totalPages = Math.ceil(totalItems / defaultLimit);
+
+    const result = await this.roleModel
+      .find(filter)
+      .skip(offset)
+      .limit(defaultLimit)
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      .sort(sort as any)
+      .populate(population)
+      .select(projection)
+      .exec();
+
+    return {
+      meta: {
+        current: currentPage,
+        pageSize: limit,
+        pages: totalPages,
+        total: totalItems,
+      },
+      result,
+    };
   }
 
   findOne(id: number) {
