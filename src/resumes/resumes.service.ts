@@ -50,7 +50,7 @@ export class ResumesService {
   }
 
   async findAll(currentPage: number, limit: number, query: Record<string, string>) {
-    const { filter, sort, population } = aqp(query);
+    const { filter, sort, population, projection } = aqp(query);
     delete filter.current;
     delete filter.pageSize;
 
@@ -68,6 +68,7 @@ export class ResumesService {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       .sort(sort as any)
       .populate(population)
+      .select(projection)
       .exec();
 
     return {
