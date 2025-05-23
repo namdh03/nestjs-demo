@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
+import mongoose from 'mongoose';
+
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
 
@@ -12,8 +14,12 @@ import { Role, RoleDocument } from './entities/role.entity';
 export class RolesService {
   constructor(@InjectModel(Role.name) private roleModel: SoftDeleteModel<RoleDocument>) {}
 
+  async checkExistedRoleName(name?: string) {
+    return await this.roleModel.findOne({ name });
+  }
+
   async create(createRoleDto: CreateRoleDto, user: IUser) {
-    const role = await this.roleModel.findOne({ name: createRoleDto.name });
+    const role = await this.checkExistedRoleName(createRoleDto.name);
     if (role) throw new BadRequestException(`Existed role with name: ${role.name}`);
     return this.roleModel.create({
       ...createRoleDto,
@@ -32,8 +38,22 @@ export class RolesService {
     return `This action returns a #${id} role`;
   }
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+  async update(_id: string, updateRoleDto: UpdateRoleDto, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('Role not found!');
+
+    const role = await this.checkExistedRoleName(updateRoleDto.name);
+    if (role) throw new BadRequestException(`Existed role with name: ${role.name}`);
+
+    return this.roleModel.updateOne(
+      { _id },
+      {
+        ...updateRoleDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+      },
+    );
   }
 
   remove(id: number) {
