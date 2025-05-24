@@ -1,5 +1,6 @@
 import { Body, Controller, Get } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { Public, ResponseMessage } from 'src/decorator/customize';
@@ -21,6 +22,7 @@ export class MailController {
   @Public()
   @Get()
   @ResponseMessage('Test email')
+  @Cron(CronExpression.EVERY_WEEKEND)
   async handleTestEmail() {
     const subscribers = await this.subscriberModel.find();
 
