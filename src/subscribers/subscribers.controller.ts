@@ -32,8 +32,9 @@ export class SubscribersController {
   }
 
   @Get(':id')
+  @ResponseMessage('Fetch a subscriber by id')
   findOne(@Param('id') id: string) {
-    return this.subscribersService.findOne(+id);
+    return this.subscribersService.findOne(id);
   }
 
   @Patch(':id')

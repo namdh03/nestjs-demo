@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
+import mongoose from 'mongoose';
+
 import aqp from 'api-query-params';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
@@ -62,8 +64,9 @@ export class SubscribersService {
     };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} subscriber`;
+  findOne(id: string) {
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new BadRequestException('Subscriber not found!');
+    return this.subscriberModel.findById(id);
   }
 
   update(id: number, updateSubscriberDto: UpdateSubscriberDto) {
