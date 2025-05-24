@@ -86,7 +86,17 @@ export class SubscribersService {
     );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} subscriber`;
+  async remove(_id: string, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('Job not found!');
+    await this.subscriberModel.updateOne(
+      { _id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+      },
+    );
+    return this.subscriberModel.softDelete({ _id });
   }
 }

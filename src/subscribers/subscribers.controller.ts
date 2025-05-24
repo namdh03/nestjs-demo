@@ -38,12 +38,14 @@ export class SubscribersController {
   }
 
   @Patch(':id')
+  @ResponseMessage('Update a subscriber')
   update(@Param('id') id: string, @Body() updateSubscriberDto: UpdateSubscriberDto, @User() user: IUser) {
     return this.subscribersService.update(id, updateSubscriberDto, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.subscribersService.remove(+id);
+  @ResponseMessage('Delete a subscriber')
+  remove(@Param('id') id: string, @User() user: IUser) {
+    return this.subscribersService.remove(id, user);
   }
 }
