@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 
-import { User } from 'src/decorator/customize';
+import { ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from 'src/users/users.interface';
 
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
@@ -12,6 +12,7 @@ export class SubscribersController {
   constructor(private readonly subscribersService: SubscribersService) {}
 
   @Post()
+  @ResponseMessage('Create a new subscriber')
   async create(@Body() createSubscriberDto: CreateSubscriberDto, @User() user: IUser) {
     const subscriber = await this.subscribersService.create(createSubscriberDto, user);
     return {
@@ -21,8 +22,13 @@ export class SubscribersController {
   }
 
   @Get()
-  findAll() {
-    return this.subscribersService.findAll();
+  @ResponseMessage('Fetch subscribers with pagination')
+  findAll(
+    @Query('current') currentPage: string,
+    @Query('pageSize') limit: string,
+    @Query() query: Record<string, string>,
+  ) {
+    return this.subscribersService.findAll(+currentPage, +limit, query);
   }
 
   @Get(':id')
