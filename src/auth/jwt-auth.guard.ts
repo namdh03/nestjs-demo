@@ -37,10 +37,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const permissions = user?.permissions ?? [];
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const isExisted = permissions.find(
+    let isExisted = permissions.find(
       (permission: { method: string; apiPath: string | undefined }) =>
         permission.method === targetMethod && permission.apiPath === targetEndpoint,
     );
+    if (targetEndpoint?.startsWith('/api/v1/auth')) isExisted = true;
 
     if (!isExisted) {
       throw new ForbiddenException();
