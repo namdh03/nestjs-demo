@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 import { Request, Response } from 'express';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
@@ -17,6 +18,7 @@ export class AuthController {
   ) {}
 
   @Public()
+  @UseGuards(ThrottlerGuard)
   @UseGuards(LocalAuthGuard)
   @ResponseMessage('Login successfully!')
   @Post('login')
