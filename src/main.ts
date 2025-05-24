@@ -4,6 +4,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { join } from 'path';
 
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
@@ -43,6 +44,7 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
+  app.use(helmet());
 
   await app.listen(port ?? 3000);
 }
