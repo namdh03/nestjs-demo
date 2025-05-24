@@ -64,13 +64,26 @@ export class SubscribersService {
     };
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) throw new BadRequestException('Subscriber not found!');
-    return this.subscriberModel.findById(id);
+    return await this.subscriberModel.findById(id);
   }
 
-  update(id: number, updateSubscriberDto: UpdateSubscriberDto) {
-    return `This action updates a #${id} subscriber`;
+  async update(_id: string, updateSubscriberDto: UpdateSubscriberDto, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(_id)) throw new BadRequestException('Subscriber not found!');
+
+    return await this.subscriberModel.updateOne(
+      {
+        _id,
+      },
+      {
+        ...updateSubscriberDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+      },
+    );
   }
 
   remove(id: number) {
