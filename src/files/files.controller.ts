@@ -12,7 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiHeader, ApiTags } from '@nestjs/swagger';
 
 import { ResponseMessage } from 'src/decorator/customize';
 
@@ -24,6 +24,23 @@ import { FilesService } from './files.service';
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        fileUpload: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiHeader({
+    name: 'folder_type',
+    required: true,
+    description: 'Custom header',
+  })
   @Post('upload')
   @ResponseMessage('Uploaded single file!')
   @UseInterceptors(FileInterceptor('fileUpload'))

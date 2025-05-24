@@ -51,7 +51,6 @@ async function bootstrap() {
     .setTitle('Nestjs Basic')
     .setDescription('Nestjs Description')
     .setVersion('1.0')
-    .addTag('nestjs')
     .addBearerAuth(
       {
         type: 'http',
@@ -65,7 +64,7 @@ async function bootstrap() {
 
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory, {
+  SwaggerModule.setup('swagger', app, documentFactory, {
     swaggerOptions: {
       persistAuthorization: true,
     },
