@@ -11,5 +11,6 @@ export interface IUser {
     name: string;
     apiPath: string;
     module: string;
+    method: string;
   }[];
 }
