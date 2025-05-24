@@ -27,7 +27,7 @@ import { MailController } from './mail.controller';
             strict: true,
           },
         },
-        preview: true,
+        preview: Boolean(configService.get<boolean>('EMAIL_PREVIEW')),
       }),
       inject: [ConfigService],
     }),
